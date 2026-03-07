@@ -1,10 +1,11 @@
 import os
 import json
 import re
-from openai import OpenAI
+from groq import Groq
 from typing import List, Dict, Any
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = Groq(api_key=os.getenv("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
+"))
 
 QUESTION_TYPE_PROMPTS = {
     "mcq": "multiple choice questions with 4 options (A, B, C, D). Mark the correct answer clearly.",
@@ -38,6 +39,7 @@ def generate_questions(
     education_level: str,
     difficulty: str,
 ) -> List[Dict[str, Any]]:
+
     q_type_prompt = QUESTION_TYPE_PROMPTS.get(question_type, QUESTION_TYPE_PROMPTS["mcq"])
     diff_desc = DIFFICULTY_DESCRIPTIONS.get(difficulty, DIFFICULTY_DESCRIPTIONS["medium"])
     edu_ctx = EDUCATION_CONTEXTS.get(education_level, EDUCATION_CONTEXTS["college"])
@@ -91,7 +93,7 @@ CONTENT:
 Generate exactly {num_questions} questions as a JSON array."""
 
     response = client.chat.completions.create(
-        model="gpt-4o",
+        model="llama3-70b-8192",
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
@@ -101,13 +103,11 @@ Generate exactly {num_questions} questions as a JSON array."""
     )
 
     raw = response.choices[0].message.content.strip()
-    # Strip markdown if present
     raw = re.sub(r'^```json\s*', '', raw)
     raw = re.sub(r'\s*```$', '', raw)
-    
+
     questions = json.loads(raw)
-    
-    # Normalize structure
+
     normalized = []
     for i, q in enumerate(questions):
         normalized.append({
@@ -119,35 +119,34 @@ Generate exactly {num_questions} questions as a JSON array."""
             "order_index": i,
             "points": 1,
         })
-    
+
     return normalized
 
 
-def grade_answer(question_type: str, correct_answer: str, user_answer: str) -> tuple[bool, float]:
+def grade_answer(question_type: str, correct_answer: str, user_answer: str) -> tuple:
     """Grade a user answer. Returns (is_correct, points_earned)"""
     if not user_answer or not user_answer.strip():
         return False, 0.0
-    
+
     if question_type in ["mcq", "true_false"]:
         is_correct = user_answer.strip().upper() == correct_answer.strip().upper()
         return is_correct, 1.0 if is_correct else 0.0
-    
+
     elif question_type == "fill_blank":
         is_correct = user_answer.strip().lower() == correct_answer.strip().lower()
         return is_correct, 1.0 if is_correct else 0.0
-    
+
     elif question_type in ["short_answer", "long_answer"]:
-        # Use AI to grade open-ended answers
         prompt = f"""Grade this answer on a scale of 0.0 to 1.0.
 Model Answer: {correct_answer}
 Student Answer: {user_answer}
 
 Respond with ONLY a JSON: {{"score": 0.8, "is_correct": true}}
 Score >= 0.6 means is_correct = true."""
-        
+
         try:
             response = client.chat.completions.create(
-                model="gpt-4o-mini",
+                model="llama3-8b-8192",
                 messages=[{"role": "user", "content": prompt}],
                 max_tokens=100,
                 temperature=0,
@@ -160,14 +159,14 @@ Score >= 0.6 means is_correct = true."""
             return result.get("is_correct", score >= 0.6), score
         except:
             return False, 0.0
-    
+
     return False, 0.0
 
 
 def suggest_quiz_title(content: str) -> str:
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="llama3-8b-8192",
             messages=[{
                 "role": "user",
                 "content": f"Suggest a concise quiz title (5-8 words) for this content. Reply ONLY with the title:\n\n{content[:1000]}"
