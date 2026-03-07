@@ -4,7 +4,8 @@ import re
 from groq import Groq
 from typing import List, Dict, Any
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+import httpx
+client = Groq(api_key=os.getenv("GROQ_API_KEY"), http_client=httpx.Client())
 
 QUESTION_TYPE_PROMPTS = {
     "mcq": "multiple choice questions with 4 options (A, B, C, D). Mark the correct answer clearly.",
