@@ -11,7 +11,10 @@ app = FastAPI(title="AI Quiz Platform", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", os.getenv("FRONTEND_URL", "*")],
+    allow_origins=[
+    "http://localhost:3000",
+    "https://questionc2.vercel.app",
+    os.getenv("FRONTEND_URL", "*"),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
