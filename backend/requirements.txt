@@ -16,3 +16,4 @@ PyJWT==2.8.0
 python-multipart==0.0.9
 aiofiles==23.2.1
 lxml==5.2.2
+bcrypt==4.0.1
