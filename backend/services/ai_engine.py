@@ -93,7 +93,7 @@ CONTENT:
 Generate exactly {num_questions} questions as a JSON array."""
 
     response = client.chat.completions.create(
-        model="llama3-70b-8192",
+        model="llama-3.3-70b-versatile",
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
@@ -146,7 +146,7 @@ Score >= 0.6 means is_correct = true."""
 
         try:
             response = client.chat.completions.create(
-                model="llama3-8b-8192",
+                model="llama-3.3-70b-versatile",
                 messages=[{"role": "user", "content": prompt}],
                 max_tokens=100,
                 temperature=0,
@@ -166,7 +166,7 @@ Score >= 0.6 means is_correct = true."""
 def suggest_quiz_title(content: str) -> str:
     try:
         response = client.chat.completions.create(
-            model="llama3-8b-8192",
+           model="llama-3.3-70b-versatile",
             messages=[{
                 "role": "user",
                 "content": f"Suggest a concise quiz title (5-8 words) for this content. Reply ONLY with the title:\n\n{content[:1000]}"
