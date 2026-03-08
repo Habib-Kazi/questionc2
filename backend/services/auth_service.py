@@ -1,18 +1,16 @@
+import bcrypt
 import jwt
 import os
 from datetime import datetime, timedelta
 from fastapi import HTTPException, Header
-from models import User
-from database import get_db
+from database import SessionLocal
 
 def hash_password(password: str) -> str:
-    import bcrypt
     password_bytes = password.encode('utf-8')[:72]
     salt = bcrypt.gensalt()
     return bcrypt.hashpw(password_bytes, salt).decode('utf-8')
 
 def verify_password(password: str, hashed: str) -> bool:
-    import bcrypt
     password_bytes = password.encode('utf-8')[:72]
     return bcrypt.checkpw(password_bytes, hashed.encode('utf-8'))
 
@@ -30,8 +28,7 @@ def get_current_user(authorization: str = Header(None)):
     token = authorization.split(" ")[1]
     try:
         payload = jwt.decode(token, os.getenv("SECRET_KEY", "secret"), algorithms=["HS256"])
-        from sqlalchemy.orm import Session
-        from database import SessionLocal
+        from models import User
         db = SessionLocal()
         user = db.query(User).filter(User.id == payload["user_id"]).first()
         db.close()
