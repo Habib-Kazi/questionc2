@@ -1,5 +1,6 @@
 import os
 import uuid
+import json
 import shutil
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form
 from sqlalchemy.orm import Session
@@ -45,7 +46,6 @@ async def upload_source(
         content_type = file.content_type
         file_type = ALLOWED_TYPES.get(content_type)
         if not file_type:
-            # Try by extension
             ext = file.filename.rsplit(".", 1)[-1].lower() if "." in file.filename else ""
             file_type = ext if ext in ["pdf", "docx", "txt", "png", "jpg", "jpeg"] else None
         
@@ -142,7 +142,7 @@ def create_quiz(req: CreateQuizRequest, db: Session = Depends(get_db), current_u
             quiz_id=quiz_id,
             type=q.type,
             question_text=q.question_text,
-            options_json=q.options_json,
+            options_json=json.dumps(q.options_json) if q.options_json else None,
             correct_answer=q.correct_answer,
             explanation=q.explanation,
             order_index=i,
@@ -165,7 +165,6 @@ def update_quiz(quiz_id: str, req: CreateQuizRequest, db: Session = Depends(get_
     quiz.education_level = req.education_level
     quiz.timer_minutes = req.timer_minutes
     
-    # Delete old questions
     db.query(Question).filter(Question.quiz_id == quiz_id).delete()
     
     for i, q in enumerate(req.questions):
@@ -173,7 +172,7 @@ def update_quiz(quiz_id: str, req: CreateQuizRequest, db: Session = Depends(get_
             quiz_id=quiz_id,
             type=q.type,
             question_text=q.question_text,
-            options_json=q.options_json,
+            options_json=json.dumps(q.options_json) if q.options_json else None,
             correct_answer=q.correct_answer,
             explanation=q.explanation,
             order_index=i,
