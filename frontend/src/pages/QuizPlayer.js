@@ -210,16 +210,23 @@ export default function QuizPlayer() {
           <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '28px', fontWeight: 300, lineHeight: '1.5', marginBottom: '36px' }}>{q.question_text}</h2>
 
           {/* MCQ options */}
-        {q.type === 'mcq' && q.options_json && (
-  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '40px' }}>
-    {Object.entries(typeof q.options_json === 'string' ? Object.entries(typeof q.options_json === 'string' ? JSON.parse(q.options_json) : q.options_json)(/'/g, '"')) : q.options_json).map(([key, val]) => (
-      <button key={key} className="opt-btn" onClick={() => setAnswer(q.id, key)} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', padding: '16px 20px', border: `1px solid ${answers[q.id] === key ? '#c4a460' : 'rgba(196,164,96,0.15)'}`, background: answers[q.id] === key ? 'rgba(196,164,96,0.1)' : 'rgba(255,255,255,0.02)', cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s', width: '100%' }}>
-        <span style={{ fontFamily: "'DM Mono',monospace", fontSize: '13px', color: answers[q.id] === key ? '#c4a460' : 'rgba(196,164,96,0.5)', flexShrink: 0, marginTop: '1px' }}>{key}</span>
-        <span style={{ fontSize: '15px', color: '#e8e4dc', lineHeight: '1.5', fontFamily: 'Georgia, serif' }}>{val}</span>
-      </button>
-    ))}
-  </div>
-)}
+       {q.type === 'mcq' && q.options_json && (() => {
+  try {
+    const opts = typeof q.options_json === 'string' ? JSON.parse(q.options_json) : q.options_json;
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '40px' }}>
+        {Object.entries(opts).map(([key, val]) => (
+          <button key={key} className="opt-btn" onClick={() => setAnswer(q.id, key)} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', padding: '16px 20px', border: `1px solid ${answers[q.id] === key ? '#c4a460' : 'rgba(196,164,96,0.15)'}`, background: answers[q.id] === key ? 'rgba(196,164,96,0.1)' : 'rgba(255,255,255,0.02)', cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s', width: '100%' }}>
+            <span style={{ fontFamily: "'DM Mono',monospace", fontSize: '13px', color: answers[q.id] === key ? '#c4a460' : 'rgba(196,164,96,0.5)', flexShrink: 0, marginTop: '1px' }}>{key}</span>
+            <span style={{ fontSize: '15px', color: '#e8e4dc', lineHeight: '1.5', fontFamily: 'Georgia, serif' }}>{val}</span>
+          </button>
+        ))}
+      </div>
+    );
+  } catch(e) {
+    return <div style={{ color: 'rgba(232,228,220,0.5)', marginBottom: '40px', padding: '16px', border: '1px solid rgba(196,164,96,0.15)' }}>Options could not be loaded for this question.</div>;
+  }
+})()}
 
           {/* True/False */}
           {q.type === 'true_false' && (
