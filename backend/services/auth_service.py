@@ -23,15 +23,31 @@ def create_token(user_id: int, email: str) -> str:
     return jwt.encode(payload, os.getenv("SECRET_KEY", "secret"), algorithm="HS256")
 
 def get_current_user(authorization: str = Header(None)):
-    if not authorization or not authorization.startswith("Bearer "):
+    if not authorization:
         raise HTTPException(status_code=401, detail="Not authenticated")
-    token = authorization.split(" ")[1]
+    
+    # Handle both "Bearer token" and plain "token"
+    if authorization.startswith("Bearer "):
+        token = authorization.split(" ")[1]
+    else:
+        token = authorization
+    
     try:
-        payload = jwt.decode(token, os.getenv("SECRET_KEY", "secret"), algorithms=["HS256"])
+        payload = jwt.decode(
+            token, 
+            os.getenv("SECRET_KEY", "secret"), 
+            algorithms=["HS256"]
+        )
         from models import User
         db = SessionLocal()
         user = db.query(User).filter(User.id == payload["user_id"]).first()
         db.close()
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
         return user
-    except:
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=f"Auth error: {str(e)}")
