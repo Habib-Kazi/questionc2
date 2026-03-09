@@ -48,7 +48,10 @@ class Response(Base):
     participant_name = Column(String)
     participant_email = Column(String)
     score = Column(Float)
+    submitted_at = Column(DateTime, server_default=func.now())
     created_at = Column(DateTime, server_default=func.now())
+
+
 
 class Answer(Base):
     __tablename__ = "answers"
