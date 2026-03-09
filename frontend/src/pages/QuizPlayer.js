@@ -212,7 +212,7 @@ export default function QuizPlayer() {
           {/* MCQ options */}
         {q.type === 'mcq' && q.options_json && (
   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '40px' }}>
-    {Object.entries(typeof q.options_json === 'string' ? JSON.parse(q.options_json) : q.options_json).map(([key, val]) => (
+    {Object.entries(typeof q.options_json === 'string' ? JSON.parse(q.options_json.replace(/'/g, '"')) : q.options_json).map(([key, val]) => (
       <button key={key} className="opt-btn" onClick={() => setAnswer(q.id, key)} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', padding: '16px 20px', border: `1px solid ${answers[q.id] === key ? '#c4a460' : 'rgba(196,164,96,0.15)'}`, background: answers[q.id] === key ? 'rgba(196,164,96,0.1)' : 'rgba(255,255,255,0.02)', cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s', width: '100%' }}>
         <span style={{ fontFamily: "'DM Mono',monospace", fontSize: '13px', color: answers[q.id] === key ? '#c4a460' : 'rgba(196,164,96,0.5)', flexShrink: 0, marginTop: '1px' }}>{key}</span>
         <span style={{ fontSize: '15px', color: '#e8e4dc', lineHeight: '1.5', fontFamily: 'Georgia, serif' }}>{val}</span>
