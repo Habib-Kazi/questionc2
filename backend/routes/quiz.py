@@ -123,6 +123,9 @@ class CreateQuizRequest(BaseModel):
 
 @router.post("/create-quiz")
 def create_quiz(req: CreateQuizRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
     quiz_id = str(uuid.uuid4())
     quiz = Quiz(
         id=quiz_id,
@@ -136,13 +139,14 @@ def create_quiz(req: CreateQuizRequest, db: Session = Depends(get_db), current_u
         is_published=True,
     )
     db.add(quiz)
+    db.flush()  # ← THIS IS THE KEY FIX - saves quiz to DB before adding questions
     
     for i, q in enumerate(req.questions):
         question = Question(
             quiz_id=quiz_id,
             type=q.type,
             question_text=q.question_text,
-            options_json=json.dumps(q.options_json) if q.options_json else None,
+            options_json=str(q.options_json) if q.options_json else None,
             correct_answer=q.correct_answer,
             explanation=q.explanation,
             order_index=i,
