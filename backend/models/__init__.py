@@ -15,35 +15,29 @@ class User(Base):
 class Quiz(Base):
     __tablename__ = "quizzes"
     __table_args__ = {"extend_existing": True}
-    id = Column(String, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True)
     title = Column(String, nullable=False)
     description = Column(Text)
     creator_id = Column(Integer, ForeignKey("users.id"))
-    difficulty = Column(String, default="medium")
-    education_level = Column(String, default="college")
-    timer_minutes = Column(Integer, default=0)
-    allow_multiple_attempts = Column(Boolean, default=False)
     is_published = Column(Boolean, default=False)
+    difficulty = Column(String, default="medium")
     created_at = Column(DateTime, server_default=func.now())
 
 class Question(Base):
     __tablename__ = "questions"
     __table_args__ = {"extend_existing": True}
     id = Column(Integer, primary_key=True, index=True)
-    quiz_id = Column(String, ForeignKey("quizzes.id"))
-    type = Column(String)
+    quiz_id = Column(Integer, ForeignKey("quizzes.id"))
     question_text = Column(Text, nullable=False)
-    options_json = Column(Text)
+    options = Column(Text)
     correct_answer = Column(String)
-    explanation = Column(Text)
-    order_index = Column(Integer, default=0)
-    points = Column(Integer, default=1)
+    points = Column(Float, default=1.0)
 
 class Response(Base):
     __tablename__ = "responses"
     __table_args__ = {"extend_existing": True}
     id = Column(Integer, primary_key=True, index=True)
-    quiz_id = Column(String, ForeignKey("quizzes.id"))
+    quiz_id = Column(Integer, ForeignKey("quizzes.id"))
     participant_name = Column(String)
     participant_email = Column(String)
     score = Column(Float)
