@@ -108,7 +108,17 @@ def get_quiz_results(quiz_id: str, db: Session = Depends(get_db), current_user: 
     }
 
 @router.get("/results/{quiz_id}/export")
-def export_results_csv(quiz_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def export_results_csv(quiz_id: str, token: str = None, db: Session = Depends(get_db)):
+    from services.auth_service import get_current_user
+    import jwt, os
+    try:
+        payload = jwt.decode(token, os.getenv("SECRET_KEY", "secret"), algorithms=["HS256"])
+        from models import User
+        current_user = db.query(User).filter(User.id == payload["user_id"]).first()
+        if not current_user:
+            raise HTTPException(401, "Not authenticated")
+    except:
+        raise HTTPException(401, "Not authenticated")
     quiz = db.query(Quiz).filter(Quiz.id == quiz_id, Quiz.creator_id == current_user.id).first()
     if not quiz:
         raise HTTPException(404, "Quiz not found")
