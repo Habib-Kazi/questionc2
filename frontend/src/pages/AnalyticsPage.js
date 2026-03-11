@@ -24,7 +24,9 @@ export default function AnalyticsPage() {
   };
 
   const exportCSV = () => {
-    window.open(`/api/creator/results/${quizId}/export`, '_blank');
+    const token = localStorage.getItem('token');
+    window.open(`${process.env.REACT_APP_API_URL}/creator/results/${quizId}/export?token=${token}`, '_blank');
+  
   };
 
   const s = {
