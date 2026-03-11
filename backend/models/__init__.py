@@ -48,6 +48,7 @@ class Response(Base):
     participant_name = Column(String)
     participant_email = Column(String)
     score = Column(Float)
+    time_taken_seconds = Column(Integer)
     submitted_at = Column(DateTime, server_default=func.now())
     created_at = Column(DateTime, server_default=func.now())
 
