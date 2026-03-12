@@ -16,214 +16,133 @@ const difficulties = ['Easy', 'Medium', 'Hard', 'Analytical', 'IQ-Based'];
 
 export default function LandingPage() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
-  const heroRef = useRef(null);
+  const { isAuthenticated, theme, themeMode, toggleTheme } = useAuth();
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    const handleMouse = (e) => {
-      setMousePos({ x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight });
-    };
+    const handleMouse = (e) => setMousePos({ x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight });
     window.addEventListener('mousemove', handleMouse);
     return () => window.removeEventListener('mousemove', handleMouse);
   }, []);
 
+  const t = theme;
+
   return (
-    <div style={{ fontFamily: "'Georgia', serif", background: '#0a0a0f', minHeight: '100vh', color: '#e8e4dc', overflow: 'hidden' }}>
+    <div style={{ fontFamily: "'Georgia', serif", background: t.bg, minHeight: '100vh', color: t.text, overflow: 'hidden' }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #0a0a0f; }
-        .hero-glow {
-          position: fixed; pointer-events: none; z-index: 0;
-          width: 600px; height: 600px; border-radius: 50%;
-          background: radial-gradient(circle, rgba(196,164,96,0.08) 0%, transparent 70%);
-          transform: translate(-50%, -50%);
-          transition: left 0.3s ease, top 0.3s ease;
+        .hero-glow { position:fixed; pointer-events:none; z-index:0; width:600px; height:600px; border-radius:50%; background:radial-gradient(circle,rgba(196,164,96,0.08) 0%,transparent 70%); transform:translate(-50%,-50%); transition:left 0.3s ease,top 0.3s ease; }
+        .fade-up { animation:fadeUp 0.8s ease forwards; opacity:0; }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);} }
+        .delay-1{animation-delay:0.2s;}.delay-2{animation-delay:0.4s;}.delay-3{animation-delay:0.6s;}.delay-4{animation-delay:0.8s;}
+        .cta-btn { background:linear-gradient(135deg,#c4a460 0%,#e8c878 50%,#c4a460 100%); color:#0a0a0f; border:none; padding:14px 32px; font-size:14px; font-family:'DM Mono',monospace; letter-spacing:2px; text-transform:uppercase; cursor:pointer; transition:all 0.3s; clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%); }
+        .cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(196,164,96,0.4);}
+        .ghost-btn { background:transparent; color:${t.accent}; border:1px solid ${t.accent}40; padding:12px 28px; font-size:14px; font-family:'DM Mono',monospace; letter-spacing:2px; text-transform:uppercase; cursor:pointer; transition:all 0.3s; text-decoration:none; display:inline-block; }
+        .ghost-btn:hover{background:${t.accent}10;}
+        .feature-card { background:${t.cardBg}; border:1px solid ${t.border}; padding:28px; transition:all 0.4s; }
+        .feature-card:hover{border-color:${t.accent}60;transform:translateY(-4px);}
+        .nav-link{color:${t.textMuted};text-decoration:none;font-family:'DM Mono',monospace;font-size:13px;letter-spacing:1px;transition:color 0.2s;}
+        .nav-link:hover{color:${t.accent};}
+        .tag{display:inline-block;background:${t.accent}15;border:1px solid ${t.accent}30;padding:6px 14px;font-family:'DM Mono',monospace;font-size:12px;color:${t.text};margin:4px;}
+        .toggle-btn{background:${t.cardBg};border:1px solid ${t.border};color:${t.text};padding:8px 14px;font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;border-radius:4px;transition:all 0.3s;}
+        @media(max-width:768px){
+          .nav-desktop{display:none!important;}
+          .nav-mobile-btn{display:flex!important;}
+          .hero-title{font-size:42px!important;}
+          .hero-pad{padding:80px 24px 60px!important;}
+          .stats-grid{grid-template-columns:1fr!important;}
+          .steps-grid{grid-template-columns:1fr!important;}
+          .features-grid{grid-template-columns:1fr!important;}
+          .types-grid{grid-template-columns:1fr!important;}
+          .nav-pad{padding:16px 24px!important;}
+          .footer-pad{flex-direction:column!important;gap:12px!important;text-align:center!important;}
+          .cta-section{padding:80px 24px!important;}
+          .section-pad{padding:60px 24px!important;}
         }
-        .fade-in { animation: fadeIn 1s ease forwards; opacity: 0; }
-        .fade-up { animation: fadeUp 0.8s ease forwards; opacity: 0; }
-        @keyframes fadeIn { to { opacity: 1; } }
-        @keyframes fadeUp { from { opacity:0; transform:translateY(30px);} to { opacity:1; transform:translateY(0);} }
-        .delay-1 { animation-delay: 0.2s; }
-        .delay-2 { animation-delay: 0.4s; }
-        .delay-3 { animation-delay: 0.6s; }
-        .delay-4 { animation-delay: 0.8s; }
-        .cta-btn {
-          background: linear-gradient(135deg, #c4a460 0%, #e8c878 50%, #c4a460 100%);
-          color: #0a0a0f; border: none; padding: 16px 40px;
-          font-size: 16px; font-family: 'DM Mono', monospace; font-weight: 400;
-          letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
-          transition: all 0.3s; clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+        @media(min-width:769px) and (max-width:1024px){
+          .features-grid{grid-template-columns:repeat(2,1fr)!important;}
+          .steps-grid{grid-template-columns:repeat(2,1fr)!important;}
+          .nav-pad{padding:20px 32px!important;}
         }
-        .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(196,164,96,0.4); filter: brightness(1.1); }
-        .ghost-btn {
-          background: transparent; color: #c4a460; border: 1px solid rgba(196,164,96,0.4);
-          padding: 14px 32px; font-size: 15px; font-family: 'DM Mono', monospace;
-          letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
-          transition: all 0.3s; text-decoration: none; display: inline-block;
-        }
-        .ghost-btn:hover { border-color: #c4a460; background: rgba(196,164,96,0.05); }
-        .feature-card {
-          background: rgba(255,255,255,0.02); border: 1px solid rgba(196,164,96,0.1);
-          padding: 32px; transition: all 0.4s;
-        }
-        .feature-card:hover { background: rgba(196,164,96,0.04); border-color: rgba(196,164,96,0.25); transform: translateY(-4px); }
-        .nav-link { color: rgba(232,228,220,0.6); text-decoration: none; font-family:'DM Mono',monospace; font-size:13px; letter-spacing:1px; transition: color 0.2s; }
-        .nav-link:hover { color: #c4a460; }
-        .section-line { width: 60px; height: 1px; background: linear-gradient(90deg, #c4a460, transparent); margin: 0 auto 40px; }
-        .badge { display: inline-block; padding: 4px 12px; border: 1px solid rgba(196,164,96,0.3); font-family:'DM Mono',monospace; font-size:11px; letter-spacing:2px; color: #c4a460; text-transform:uppercase; }
-        .grid-overlay { position:fixed; inset:0; background-image: linear-gradient(rgba(196,164,96,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(196,164,96,0.03) 1px, transparent 1px); background-size: 60px 60px; pointer-events:none; z-index:0; }
-        .stat-num { font-family:'Cormorant Garamond',serif; font-size:52px; font-weight:300; color:#c4a460; line-height:1; }
-        .tag { display:inline-block; background:rgba(196,164,96,0.08); border:1px solid rgba(196,164,96,0.2); padding:6px 14px; font-family:'DM Mono',monospace; font-size:12px; color:rgba(232,228,220,0.7); margin: 4px; }
+        .mobile-menu{display:none;flex-direction:column;gap:16px;padding:20px 24px;background:${t.nav};border-bottom:1px solid ${t.border};}
+        .mobile-menu.open{display:flex;}
+        .nav-mobile-btn{display:none;background:none;border:none;cursor:pointer;font-size:22px;color:${t.text};}
       `}</style>
 
-      {/* Cursor glow */}
       <div className="hero-glow" style={{ left: `${mousePos.x * 100}%`, top: `${mousePos.y * 100}%` }} />
-      <div className="grid-overlay" />
 
       {/* NAV */}
-      <nav style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 60px', borderBottom: '1px solid rgba(196,164,96,0.08)' }}>
-        <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '22px', fontWeight: 300, letterSpacing: '3px', color: '#c4a460' }}>
-          QUIZFORGE<span style={{ color: 'rgba(232,228,220,0.4)', fontSize: '16px' }}>.AI</span>
+      <nav style={{ position:'relative', zIndex:10, background:t.nav, borderBottom:`1px solid ${t.border}`, transition:'all 0.3s' }}>
+        <div className="nav-pad" style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'20px 60px' }}>
+          <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'22px', fontWeight:300, letterSpacing:'3px', color:t.accent }}>
+            QUIZFORGE<span style={{ color:t.textMuted, fontSize:'16px' }}>.AI</span>
+          </div>
+          <div className="nav-desktop" style={{ display:'flex', gap:'32px', alignItems:'center' }}>
+            <a href="#features" className="nav-link">Features</a>
+            <a href="#how-it-works" className="nav-link">How it works</a>
+            <button className="toggle-btn" onClick={toggleTheme}>{themeMode==='dark'?'☀️ Light':'🌙 Dark'}</button>
+            {isAuthenticated ? (
+              <button className="cta-btn" style={{ padding:'10px 24px', fontSize:'12px' }} onClick={() => navigate('/dashboard')}>Dashboard</button>
+            ) : (
+              <>
+                <Link to="/login" className="nav-link">Sign in</Link>
+                <button className="cta-btn" style={{ padding:'10px 24px', fontSize:'12px' }} onClick={() => navigate('/register')}>Get Started</button>
+              </>
+            )}
+          </div>
+          <button className="nav-mobile-btn" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? '✕' : '☰'}</button>
         </div>
-        <div style={{ display: 'flex', gap: '40px', alignItems: 'center' }}>
-          <a href="#features" className="nav-link">Features</a>
-          <a href="#how-it-works" className="nav-link">How it works</a>
+        <div className={`mobile-menu ${menuOpen ? 'open' : ''}`}>
+          <a href="#features" className="nav-link" onClick={() => setMenuOpen(false)}>Features</a>
+          <a href="#how-it-works" className="nav-link" onClick={() => setMenuOpen(false)}>How it works</a>
+          <button className="toggle-btn" style={{ alignSelf:'flex-start' }} onClick={toggleTheme}>{themeMode==='dark'?'☀️ Light Mode':'🌙 Dark Mode'}</button>
           {isAuthenticated ? (
-            <button className="cta-btn" style={{ padding: '10px 24px', fontSize: '12px' }} onClick={() => navigate('/dashboard')}>Dashboard</button>
+            <button className="cta-btn" style={{ alignSelf:'flex-start' }} onClick={() => { navigate('/dashboard'); setMenuOpen(false); }}>Dashboard</button>
           ) : (
             <>
-              <Link to="/login" className="nav-link">Sign in</Link>
-              <button className="cta-btn" style={{ padding: '10px 24px', fontSize: '12px' }} onClick={() => navigate('/register')}>Get Started</button>
+              <Link to="/login" className="nav-link" onClick={() => setMenuOpen(false)}>Sign in</Link>
+              <button className="cta-btn" style={{ alignSelf:'flex-start' }} onClick={() => { navigate('/register'); setMenuOpen(false); }}>Get Started</button>
             </>
           )}
         </div>
       </nav>
 
       {/* HERO */}
-      <section style={{ position: 'relative', zIndex: 1, textAlign: 'center', padding: '120px 60px 100px' }}>
-        <div className="fade-in" style={{ marginBottom: '24px' }}>
-          <span className="badge">Powered by GPT-4</span>
-        </div>
-        
-        <h1 className="fade-up delay-1" style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(52px, 8vw, 96px)', fontWeight: 300, lineHeight: 1.05, marginBottom: '32px', letterSpacing: '-1px' }}>
-          Turn any source<br />
-          <em style={{ color: '#c4a460', fontStyle: 'italic' }}>into a quiz.</em>
+      <section className="hero-pad" style={{ position:'relative', zIndex:1, textAlign:'center', padding:'120px 60px 100px' }}>
+        <h1 className="fade-up delay-1 hero-title" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(42px,8vw,96px)', fontWeight:300, lineHeight:1.05, marginBottom:'32px' }}>
+          Turn any source<br /><em style={{ color:t.accent }}>into a quiz.</em>
         </h1>
-        
-        <p className="fade-up delay-2" style={{ fontSize: '18px', color: 'rgba(232,228,220,0.55)', maxWidth: '580px', margin: '0 auto 16px', lineHeight: '1.7', fontWeight: 300 }}>
+        <p className="fade-up delay-2" style={{ fontSize:'clamp(15px,2vw,18px)', color:t.textMuted, maxWidth:'580px', margin:'0 auto 16px', lineHeight:'1.7' }}>
           Upload a PDF, paste a URL, or drop an image. QuizForge extracts the knowledge and crafts intelligent assessments in seconds.
         </p>
-        
-        <p className="fade-up delay-2" style={{ fontSize: '14px', color: 'rgba(196,164,96,0.6)', fontFamily: "'DM Mono', monospace", letterSpacing: '1px', marginBottom: '52px' }}>
+        <p className="fade-up delay-2" style={{ fontSize:'13px', color:t.accent, fontFamily:"'DM Mono',monospace", letterSpacing:'1px', marginBottom:'48px', opacity:0.7 }}>
           No setup. No friction. Just intelligence.
         </p>
-        
-        <div className="fade-up delay-3" style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <button className="cta-btn" onClick={() => navigate(isAuthenticated ? '/upload' : '/register')}>
-            Start Creating Free
-          </button>
+        <div className="fade-up delay-3" style={{ display:'flex', gap:'16px', justifyContent:'center', flexWrap:'wrap' }}>
+          <button className="cta-btn" onClick={() => navigate(isAuthenticated ? '/upload' : '/register')}>Start Creating Free</button>
           <a href="#how-it-works" className="ghost-btn">See how it works</a>
         </div>
-
-        {/* Floating source type pills */}
-        <div className="fade-in delay-4" style={{ marginTop: '80px', display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          {['PDF Documents', 'DOCX Files', 'Web URLs', 'Images (OCR)', 'Plain Text'].map(t => (
-            <span key={t} className="tag">{t}</span>
+        <div className="fade-up delay-4" style={{ marginTop:'60px', display:'flex', gap:'10px', justifyContent:'center', flexWrap:'wrap' }}>
+          {['PDF Documents','DOCX Files','Web URLs','Images (OCR)','Plain Text'].map(t2 => (
+            <span key={t2} className="tag">{t2}</span>
           ))}
         </div>
       </section>
 
       {/* STATS */}
-      <section style={{ position: 'relative', zIndex: 1, borderTop: '1px solid rgba(196,164,96,0.08)', borderBottom: '1px solid rgba(196,164,96,0.08)', padding: '60px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0' }}>
-        {[
-          { num: '5+', label: 'Question Types' },
-          { num: '6', label: 'Difficulty Levels' },
-          { num: '∞', label: 'Source Formats' },
-        ].map((s, i) => (
-          <div key={i} style={{ textAlign: 'center', padding: '20px', borderRight: i < 2 ? '1px solid rgba(196,164,96,0.08)' : 'none' }}>
-            <div className="stat-num">{s.num}</div>
-            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '12px', color: 'rgba(232,228,220,0.4)', letterSpacing: '2px', textTransform: 'uppercase', marginTop: '8px' }}>{s.label}</div>
-          </div>
-        ))}
+      <section style={{ position:'relative', zIndex:1, borderTop:`1px solid ${t.border}`, borderBottom:`1px solid ${t.border}`, padding:'48px 24px' }}>
+        <div className="stats-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', maxWidth:'800px', margin:'0 auto' }}>
+          {[{num:'5+',label:'Question Types'},{num:'6',label:'Difficulty Levels'},{num:'∞',label:'Source Formats'}].map((s,i) => (
+            <div key={i} style={{ textAlign:'center', padding:'20px', borderRight:i<2?`1px solid ${t.border}`:'none' }}>
+              <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(36px,5vw,52px)', fontWeight:300, color:t.accent, lineHeight:1 }}>{s.num}</div>
+              <div style={{ fontFamily:"'DM Mono',monospace", fontSize:'11px', color:t.textMuted, letterSpacing:'2px', textTransform:'uppercase', marginTop:'8px' }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* HOW IT WORKS */}
-      <section id="how-it-works" style={{ position: 'relative', zIndex: 1, padding: '100px 60px', textAlign: 'center' }}>
-        <div className="section-line" />
-        <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '48px', fontWeight: 300, marginBottom: '16px' }}>From source to quiz in <em style={{ color: '#c4a460' }}>three steps</em></h2>
-        <p style={{ color: 'rgba(232,228,220,0.4)', fontFamily: "'DM Mono', monospace", fontSize: '13px', letterSpacing: '1px', marginBottom: '80px' }}>No prompts. No configuration. Pure automation.</p>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2px', maxWidth: '960px', margin: '0 auto' }}>
-          {[
-            { step: '01', title: 'Upload Source', desc: 'Drop a PDF, paste a URL, or upload an image. Our extraction engine pulls clean text from any format.', icon: '⬆' },
-            { step: '02', title: 'Configure & Generate', desc: 'Choose question type, difficulty, and education level. GPT-4 crafts precise, pedagogically sound questions.', icon: '⚙' },
-            { step: '03', title: 'Share & Analyze', desc: 'Get a shareable quiz link instantly. Track responses, scores, and insights from your dashboard.', icon: '📈' },
-          ].map((s) => (
-            <div key={s.step} style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(196,164,96,0.08)', padding: '48px 36px', textAlign: 'left' }}>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '11px', color: '#c4a460', letterSpacing: '3px', marginBottom: '24px' }}>{s.step}</div>
-              <div style={{ fontSize: '32px', marginBottom: '20px' }}>{s.icon}</div>
-              <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '26px', fontWeight: 400, marginBottom: '16px' }}>{s.title}</h3>
-              <p style={{ color: 'rgba(232,228,220,0.5)', fontSize: '15px', lineHeight: '1.7', fontFamily: "'Georgia', serif" }}>{s.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* FEATURES */}
-      <section id="features" style={{ position: 'relative', zIndex: 1, padding: '80px 60px', textAlign: 'center' }}>
-        <div className="section-line" />
-        <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '48px', fontWeight: 300, marginBottom: '60px' }}>Everything you need</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1px', maxWidth: '1000px', margin: '0 auto' }}>
-          {features.map((f) => (
-            <div key={f.title} className="feature-card" style={{ textAlign: 'left' }}>
-              <div style={{ fontSize: '28px', marginBottom: '16px' }}>{f.icon}</div>
-              <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '22px', fontWeight: 400, marginBottom: '10px' }}>{f.title}</h3>
-              <p style={{ color: 'rgba(232,228,220,0.45)', fontSize: '14px', lineHeight: '1.6' }}>{f.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* QUESTION TYPES */}
-      <section style={{ position: 'relative', zIndex: 1, padding: '80px 60px', borderTop: '1px solid rgba(196,164,96,0.08)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px', maxWidth: '1000px', margin: '0 auto' }}>
-        <div>
-          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '11px', color: '#c4a460', letterSpacing: '3px', marginBottom: '24px' }}>QUESTION TYPES</div>
-          {questionTypes.map((t, i) => (
-            <div key={t} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px 0', borderBottom: '1px solid rgba(196,164,96,0.06)' }}>
-              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: '11px', color: 'rgba(196,164,96,0.4)' }}>0{i+1}</span>
-              <span style={{ fontSize: '16px' }}>{t}</span>
-            </div>
-          ))}
-        </div>
-        <div>
-          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '11px', color: '#c4a460', letterSpacing: '3px', marginBottom: '24px' }}>DIFFICULTY LEVELS</div>
-          {difficulties.map((d, i) => (
-            <div key={d} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px 0', borderBottom: '1px solid rgba(196,164,96,0.06)' }}>
-              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: '11px', color: 'rgba(196,164,96,0.4)' }}>0{i+1}</span>
-              <span style={{ fontSize: '16px' }}>{d}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA FOOTER */}
-      <section style={{ position: 'relative', zIndex: 1, textAlign: 'center', padding: '120px 60px', borderTop: '1px solid rgba(196,164,96,0.08)' }}>
-        <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(40px,5vw,72px)', fontWeight: 300, marginBottom: '24px', lineHeight: 1.1 }}>
-          Ready to transform<br /><em style={{ color: '#c4a460' }}>your knowledge?</em>
-        </h2>
-        <p style={{ color: 'rgba(232,228,220,0.4)', fontSize: '16px', marginBottom: '48px' }}>Free to start. No credit card required.</p>
-        <button className="cta-btn" style={{ fontSize: '14px', padding: '18px 48px' }} onClick={() => navigate(isAuthenticated ? '/upload' : '/register')}>
-          Create Your First Quiz
-        </button>
-      </section>
-
-      {/* FOOTER */}
-      <footer style={{ position: 'relative', zIndex: 1, padding: '32px 60px', borderTop: '1px solid rgba(196,164,96,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '18px', color: 'rgba(196,164,96,0.6)', letterSpacing: '2px' }}>QUIZFORGE.AI</div>
-        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '11px', color: 'rgba(232,228,220,0.2)', letterSpacing: '1px' }}>© 2025 QuizForge. All rights reserved.</div>
-      </footer>
-    </div>
-  );
-}
+      <section id="how-it-works" className="section-pad" style={{ position:'relative', zIndex:1, padding:'80px 60px', textAlign:'center' }}>
+        <h2 style={{ fontFamily:"'Cormorant Garamond',s
