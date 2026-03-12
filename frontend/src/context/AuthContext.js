@@ -16,8 +16,8 @@ export const themes = {
     inputBorder: "rgba(196,164,96,0.2)",
   },
   light: {
-    bg: "#f5f3ee",
-    nav: "#ffffff",
+  bg: "#f0d4d1",
+nav: "#fdf6f5",
     border: "rgba(196,164,96,0.3)",
     text: "#1a1a2e",
     textMuted: "rgba(26,26,46,0.5)",
