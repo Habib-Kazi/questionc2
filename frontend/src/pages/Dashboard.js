@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 
 export default function Dashboard() {
-  const { user, logout, theme, themeMode, toggleTheme } = useAuth();
+const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
