@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
@@ -17,20 +18,22 @@ function PrivateRoute({ children }) {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/upload" element={<PrivateRoute><UploadPage /></PrivateRoute>} />
-          <Route path="/editor/:quizId?" element={<PrivateRoute><QuizEditor /></PrivateRoute>} />
-          <Route path="/quiz/:quizId" element={<QuizPlayer />} />
-          <Route path="/result/:responseId" element={<ResultPage />} />
-          <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-          <Route path="/analytics/:quizId" element={<PrivateRoute><AnalyticsPage /></PrivateRoute>} />
-        </Routes>
-      </Router>
-    </AuthProvider>
+    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/upload" element={<PrivateRoute><UploadPage /></PrivateRoute>} />
+            <Route path="/editor/:quizId?" element={<PrivateRoute><QuizEditor /></PrivateRoute>} />
+            <Route path="/quiz/:quizId" element={<QuizPlayer />} />
+            <Route path="/result/:responseId" element={<ResultPage />} />
+            <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+            <Route path="/analytics/:quizId" element={<PrivateRoute><AnalyticsPage /></PrivateRoute>} />
+          </Routes>
+        </Router>
+      </AuthProvider>
+    </GoogleOAuthProvider>
   );
 }
